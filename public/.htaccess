@@ -1,7 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     # Change RewriteBase if your project is in a different folder (e.g. /mystore/public/)
-    RewriteBase /php/Decor_and_Furniture/public/
+RewriteBase /
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
