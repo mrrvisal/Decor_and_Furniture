@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: decor-and-furniture
+    runtime: php
+    buildCommand: composer install --no-dev --prefer-dist
+    startCommand: php -S 0.0.0.0:$PORT -t public public/index.php
+    envVars:
+      - key: APP_ENV
+        value: production
