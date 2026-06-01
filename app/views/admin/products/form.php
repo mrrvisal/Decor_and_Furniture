@@ -47,6 +47,28 @@ $action = $isEdit ? base_url('admin/product/update/' . $product['id']) : base_ur
                 </div>
 
                 <div class="form-group">
+                    <label for="supplier_id">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 7h18" />
+                            <path d="M7 7v10" />
+                            <path d="M17 7v10" />
+                            <path d="M9 17h6" />
+                        </svg>
+                        Supplier
+                    </label>
+                    <select id="supplier_id" name="supplier_id" class="form-select">
+                        <option value="">None</option>
+                        <?php foreach ($suppliers as $supplier): ?>
+                        <option value="<?= $supplier['id'] ?>"
+                            <?= ((string) ($product['supplier_id'] ?? '')) === (string) $supplier['id'] ? 'selected' : '' ?>>
+                            <?= e($supplier['name']) ?><?= !empty($supplier['email']) ? ' (' . e($supplier['email']) . ')' : '' ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="name">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">

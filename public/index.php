@@ -41,6 +41,19 @@ $router->get('/', 'PageController@home');
 $router->get('/products', 'ProductController@index');
 $router->get('/product/{slug}', 'ProductController@show');
 
+// Reviews
+$router->post('/review/helpful', 'ReviewController@helpful');
+$router->get('/product/{slug}/review', 'ReviewController@form');
+$router->post('/product/{slug}/review', 'ReviewController@submit');
+
+$router->get('/admin/stock-alerts', 'AdminController@stockAlerts');
+$router->post('/admin/stock-alert/resolve/{id}', 'AdminController@resolveStockAlert');
+
+// Admin Reviews
+$router->get('/admin/reviews', 'ReviewController@adminIndex');
+$router->post('/admin/review/approve/{id}', 'ReviewController@adminApprove');
+$router->post('/admin/review/delete/{id}', 'ReviewController@adminDelete');
+
 // Pages
 $router->get('/about', 'PageController@about');
 $router->get('/faq', 'PageController@faq');
@@ -49,6 +62,7 @@ $router->get('/returns', 'PageController@returns');
 $router->get('/contact', 'PageController@contact');
 $router->post('/contact', 'PageController@contactSubmit');
 $router->get('/profile', 'PageController@profile');
+$router->post('/profile/update', 'PageController@profileUpdate');
 $router->get('/settings', 'PageController@settings');
 $router->post('/settings', 'PageController@settingsUpdate');
 
@@ -86,8 +100,9 @@ $router->get('/order/my-orders', 'OrderController@myOrders');
 $router->get('/order/{orderNumber}', 'OrderController@show');
 
 // Admin (require admin session)
-$router->get('/admin', 'AdminController@index');
+$router->get('/admin', 'AdminController@analytics');
 $router->get('/admin/profile', 'AdminController@profile');
+$router->post('/admin/profile/update', 'AdminController@profileUpdate');
 $router->get('/admin/products', 'AdminController@products');
 $router->get('/admin/product/add', 'AdminController@productAdd');
 $router->post('/admin/product/store', 'AdminController@productStore');
@@ -98,6 +113,7 @@ $router->post('/admin/product/toggle-status/{id}', 'AdminController@productToggl
 $router->get('/admin/orders', 'AdminController@orders');
 $router->get('/admin/order/{id}', 'AdminController@orderShow');
 $router->post('/admin/order/update-status/{id}', 'AdminController@orderUpdateStatus');
+$router->post('/admin/order/update-delivery/{id}', 'AdminController@orderUpdateDelivery');
 
 // User Management
 $router->get('/admin/users', 'AdminController@users');
@@ -109,5 +125,15 @@ $router->post('/admin/user/update/{id}', 'AdminController@userUpdate');
 $router->get('/admin/user/{id}', 'AdminController@userShow');
 $router->post('/admin/user/delete/{id}', 'AdminController@userDelete');
 $router->post('/admin/user/toggle-status/{id}', 'AdminController@userToggleStatus');
+$router->get('/admin/analytics', 'AdminController@analytics');
+$router->get('/admin/audit-logs', 'AdminController@auditLogs');
+
+// Suppliers (admin)
+$router->get('/admin/suppliers', 'AdminController@suppliers');
+$router->get('/admin/supplier/add', 'AdminController@supplierAdd');
+$router->post('/admin/supplier/store', 'AdminController@supplierStore');
+$router->get('/admin/supplier/edit/{id}', 'AdminController@supplierEdit');
+$router->post('/admin/supplier/update/{id}', 'AdminController@supplierUpdate');
+$router->post('/admin/supplier/delete/{id}', 'AdminController@supplierDelete');
 
 $router->dispatch();

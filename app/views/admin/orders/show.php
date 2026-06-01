@@ -81,6 +81,52 @@
             </div>
         </div>
 
+        <div class="info-card">
+            <div class="info-card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 17h4V5H2v12h3" />
+                    <path d="M14 17h1a2 2 0 0 0 2-2v-3h3l2 3v2h-2" />
+                    <circle cx="7.5" cy="17.5" r="2.5" />
+                    <circle cx="17.5" cy="17.5" r="2.5" />
+                </svg>
+                <h2>Delivery Tracking</h2>
+            </div>
+            <div class="info-card-body">
+                <form method="post" action="<?= base_url('admin/order/update-delivery/' . $order['id']) ?>"
+                    class="status-form">
+                    <input type="hidden" name="csrf_token" value="<?= e($csrf_token ?? '') ?>">
+                    <div class="form-group">
+                        <label for="delivery-status-select">Delivery Status</label>
+                        <select name="delivery_status" id="delivery-status-select" class="status-select">
+                            <?php foreach (['not_ready' => 'Not ready', 'ready' => 'Ready', 'out_for_delivery' => 'Out for delivery', 'delivered' => 'Delivered'] as $value => $label): ?>
+                            <option value="<?= e($value) ?>" <?= (($order['delivery_status'] ?? 'not_ready') === $value) ? 'selected' : '' ?>>
+                                <?= e($label) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="courier-name">Courier</label>
+                        <input type="text" id="courier-name" name="courier_name" class="delivery-input"
+                            value="<?= e($order['courier_name'] ?? '') ?>" placeholder="Driver or company name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tracking-number">Tracking Number</label>
+                        <input type="text" id="tracking-number" name="tracking_number" class="delivery-input"
+                            value="<?= e($order['tracking_number'] ?? '') ?>" placeholder="Tracking code">
+                    </div>
+                    <div class="form-group">
+                        <label for="estimated-delivery-date">Estimated Delivery</label>
+                        <input type="date" id="estimated-delivery-date" name="estimated_delivery_date"
+                            class="delivery-input" value="<?= e($order['estimated_delivery_date'] ?? '') ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Update Delivery
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <div class="info-card info-card-action">
             <div class="info-card-header">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -134,6 +180,14 @@
                         <span class="info-label">Order Total</span>
                         <span class="info-value total-highlight">$<?= number_format($order['total_amount'], 2) ?></span>
                     </div>
+                    <div class="info-row">
+                        <span class="info-label">Delivery Method</span>
+                        <span class="info-value"><?= e(ucfirst(str_replace('_', ' ', $order['delivery_method'] ?? 'local'))) ?></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Delivery Fee</span>
+                        <span class="info-value">$<?= number_format((float) ($order['delivery_fee'] ?? 0), 2) ?></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -175,6 +229,10 @@
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-right total-label">Delivery Fee</td>
+                        <td class="text-right total-value">$<?= number_format((float) ($order['delivery_fee'] ?? 0), 2) ?></td>
+                    </tr>
                     <tr>
                         <td colspan="3" class="text-right total-label">Grand Total</td>
                         <td class="text-right total-value">$<?= number_format($order['total_amount'], 2) ?></td>
@@ -383,7 +441,8 @@
     font-size: 0.9rem;
 }
 
-.status-select {
+.status-select,
+.delivery-input {
     width: 100%;
     padding: 0.6rem 1rem;
     border: 1px solid var(--border);
@@ -394,7 +453,12 @@
     cursor: pointer;
 }
 
-.status-select:focus {
+.delivery-input {
+    cursor: text;
+}
+
+.status-select:focus,
+.delivery-input:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);

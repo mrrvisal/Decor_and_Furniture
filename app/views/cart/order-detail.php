@@ -100,6 +100,51 @@
             </div>
         </div>
 
+        <div class="order-detail-card delivery-card">
+            <div class="card-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <h2>Delivery</h2>
+            </div>
+            <div class="card-body">
+                <div class="delivery-summary-row">
+                    <span>Method</span>
+                    <strong><?= e(ucfirst(str_replace('_', ' ', $order['delivery_method'] ?? 'local'))) ?></strong>
+                </div>
+                <div class="delivery-summary-row">
+                    <span>Status</span>
+                    <strong><?= e(ucfirst(str_replace('_', ' ', $order['delivery_status'] ?? 'not_ready'))) ?></strong>
+                </div>
+                <?php if (!empty($order['courier_name'])): ?>
+                <div class="delivery-summary-row">
+                    <span>Courier</span>
+                    <strong><?= e($order['courier_name']) ?></strong>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($order['tracking_number'])): ?>
+                <div class="delivery-summary-row">
+                    <span>Tracking</span>
+                    <strong><?= e($order['tracking_number']) ?></strong>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($order['estimated_delivery_date'])): ?>
+                <div class="delivery-summary-row">
+                    <span>Estimated delivery</span>
+                    <strong><?= date('M j, Y', strtotime($order['estimated_delivery_date'])) ?></strong>
+                </div>
+                <?php endif; ?>
+                <div class="delivery-summary-row">
+                    <span>Delivery fee</span>
+                    <strong><?= (float) ($order['delivery_fee'] ?? 0) > 0 ? '$' . number_format((float) $order['delivery_fee'], 2) : 'Free' ?></strong>
+                </div>
+            </div>
+        </div>
+
         <!-- Order Items Card -->
         <div class="order-detail-card items-card">
             <div class="card-header">
@@ -133,7 +178,11 @@
                     </tbody>
                 </table>
                 <div class="order-total-section">
-                    <span class="total-label">Total</span>
+                    <span class="total-label">Delivery</span>
+                    <span class="total-amount"><?= (float) ($order['delivery_fee'] ?? 0) > 0 ? '$' . number_format((float) $order['delivery_fee'], 2) : 'Free' ?></span>
+                </div>
+                <div class="order-total-section">
+                    <span class="total-label">Grand Total</span>
                     <span class="total-amount">$<?= number_format($order['total_amount'], 2) ?></span>
                 </div>
             </div>
@@ -196,6 +245,9 @@
                 </div>
                 <div class="step-content">
                     <span class="step-title">Shipped</span>
+                    <?php if (!empty($order['tracking_number'])): ?>
+                    <span class="step-date">Tracking: <?= e($order['tracking_number']) ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="timeline-step <?= $order['status'] === 'delivered' ? 'completed' : '' ?>">
@@ -207,6 +259,9 @@
                 </div>
                 <div class="step-content">
                     <span class="step-title">Delivered</span>
+                    <?php if (!empty($order['delivered_at'])): ?>
+                    <span class="step-date"><?= date('M j, Y H:i', strtotime($order['delivered_at'])) ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -383,6 +438,27 @@
 .shipping-city {
     color: var(--text-muted);
     font-size: 0.9rem;
+}
+
+.delivery-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .65rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.delivery-summary-row:last-child {
+    border-bottom: none;
+}
+
+.delivery-summary-row span {
+    color: var(--text-muted);
+}
+
+.delivery-summary-row strong {
+    color: var(--text);
+    text-align: right;
 }
 
 /* Order Items Table */

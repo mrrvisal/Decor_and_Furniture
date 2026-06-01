@@ -101,3 +101,331 @@
         </div>
     </div>
 </section>
+
+<!-- Reviews Section -->
+<?php
+$reviewModel = new \App\Models\Review();
+$ratingSummary = $reviewModel->getRatingSummary($product['id']);
+$reviews = $reviewModel->getForProduct($product['id'], 5, 0);
+$canReview = !empty($_SESSION['user_id']);
+?>
+
+<section class="reviews-section">
+    <div class="reviews-header">
+        <h2>Customer Reviews</h2>
+        <?php if ($canReview): ?>
+        <a href="<?= base_url('product/' . $product['slug'] . '/review') ?>" class="btn btn-primary btn-sm">
+            Write a Review
+        </a>
+        <?php endif; ?>
+    </div>
+
+    <!-- Rating Summary -->
+    <div class="rating-summary">
+        <div class="rating-average">
+            <div class="average-score"><?= number_format($ratingSummary['average_rating'], 1) ?></div>
+            <div class="stars-display">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                <span class="star <?= $i <= round($ratingSummary['average_rating']) ? 'filled' : '' ?>">★</span>
+                <?php endfor; ?>
+            </div>
+            <div class="total-reviews">Based on <?= $ratingSummary['total_reviews'] ?> reviews</div>
+        </div>
+        
+        <div class="rating-bars">
+            <?php 
+            $levels = [
+                'five' => '5 star',
+                'four' => '4 star', 
+                'three' => '3 star',
+                'two' => '2 star',
+                'one' => '1 star'
+            ];
+            foreach ($levels as $key => $label):
+                $percent = $ratingSummary[$key . '_percent'] ?? 0;
+            ?>
+            <div class="rating-bar-item">
+                <span class="rating-label"><?= $label ?></span>
+                <div class="bar-container">
+                    <div class="bar-fill" style="width: <?= $percent ?>%"></div>
+                </div>
+                <span class="rating-percent"><?= $percent ?>%</span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <?php if (empty($reviews)): ?>
+    <div class="no-reviews">
+        <div class="no-reviews-icon">📝</div>
+        <p>No reviews yet. Be the first to review this product!</p>
+        <?php if ($canReview): ?>
+        <a href="<?= base_url('product/' . $product['slug'] . '/review') ?>" class="btn btn-primary">
+            Write a Review
+        </a>
+        <?php endif; ?>
+    </div>
+    <?php else: ?>
+    <div class="reviews-list">
+        <?php foreach ($reviews as $review): ?>
+        <div class="review-card" data-review-id="<?= $review['id'] ?>">
+            <div class="review-header-card">
+                <div class="reviewer-info">
+                    <span class="reviewer-initials">
+                        <?= strtoupper(substr($review['user_name'], 0, 2)) ?>
+                    </span>
+                    <div>
+                        <div class="reviewer-name"><?= e($review['user_name']) ?></div>
+                        <div class="review-date"><?= date('M j, Y', strtotime($review['created_at'])) ?></div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <span class="star <?= $i <= $review['rating'] ? 'filled' : '' ?>">★</span>
+                    <?php endfor; ?>
+                </div>
+            </div>
+            <?php if (!empty($review['title'])): ?>
+            <h4 class="review-title"><?= e($review['title']) ?></h4>
+            <?php endif; ?>
+            <p class="review-comment"><?= nl2br(e($review['comment'])) ?></p>
+            <?php if ($review['is_verified_purchase']): ?>
+            <div class="verified-badge">✓ Verified Purchase</div>
+            <?php endif; ?>
+            <div class="review-footer">
+                <button class="btn-helpful" data-review-id="<?= $review['id'] ?>">
+                    👍 Helpful (<span class="helpful-count"><?= $review['helpful_count'] ?></span>)
+                </button>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+</section>
+
+<style>
+.reviews-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.reviews-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+.rating-summary {
+    display: flex;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.rating-average {
+    text-align: center;
+    min-width: 150px;
+}
+.average-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text);
+}
+.stars-display .star {
+    font-size: 1.25rem;
+    color: #ddd;
+}
+.stars-display .star.filled {
+    color: #ffc107;
+}
+.total-reviews {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+.rating-bars {
+    flex: 1;
+    min-width: 200px;
+}
+.rating-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.rating-label {
+    width: 60px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.bar-container {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+}
+.rating-percent {
+    width: 45px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.review-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+.review-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.reviewer-initials {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.reviewer-name {
+    font-weight: 600;
+    color: var(--text);
+}
+.review-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.review-rating .star {
+    font-size: 1rem;
+    color: #ddd;
+}
+.review-rating .star.filled {
+    color: #ffc107;
+}
+.review-title {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.review-comment {
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0.5rem 0;
+}
+.verified-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--success);
+    background: var(--success-bg);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    margin: 0.5rem 0;
+}
+.review-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+.btn-helpful {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+.btn-helpful:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+.no-reviews {
+    text-align: center;
+    padding: 3rem;
+    background: var(--bg);
+    border-radius: var(--radius);
+}
+.no-reviews-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+.no-reviews p {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+@media (max-width: 768px) {
+    .rating-summary {
+        flex-direction: column;
+        align-items: center;
+    }
+    .rating-bars {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.querySelectorAll('.btn-helpful').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const reviewId = this.dataset.reviewId;
+        const csrfToken = '<?= e($csrf_token ?? '') ?>';
+        
+        try {
+            const response = await fetch('<?= base_url('review/helpful') ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `csrf_token=${encodeURIComponent(csrfToken)}&review_id=${reviewId}`
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const countSpan = this.querySelector('.helpful-count');
+                countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                this.disabled = true;
+                this.style.opacity = '0.6';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
+</script>

@@ -116,6 +116,82 @@ class PageController extends Controller
         ]);
     }
 
+    /** Update customer profile */
+    public function profileUpdate(): void
+    {
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['error'] = 'Please login to update your profile.';
+            $this->redirect($this->baseUrl('auth/login'));
+        }
+        if (!$this->validateCsrf()) {
+            $_SESSION['error'] = 'Invalid request.';
+            $this->redirect($this->baseUrl('profile'));
+        }
+
+        $userModel = new User();
+        $userId = (int) $_SESSION['user_id'];
+        $user = $userModel->find($userId);
+        if (!$user) {
+            $_SESSION['error'] = 'User not found.';
+            $this->redirect($this->baseUrl());
+        }
+
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (strlen($name) < 2) {
+            $_SESSION['error'] = 'Name must be at least 2 characters.';
+            $this->redirect($this->baseUrl('profile'));
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = 'Please enter a valid email address.';
+            $this->redirect($this->baseUrl('profile'));
+        }
+
+        $existing = $userModel->findByEmail($email);
+        if ($existing && (int) $existing['id'] !== $userId) {
+            $_SESSION['error'] = 'Email is already in use by another account.';
+            $this->redirect($this->baseUrl('profile'));
+        }
+
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+        ];
+
+        if ($currentPassword !== '' || $newPassword !== '' || $confirmPassword !== '') {
+            if (!password_verify($currentPassword, $user['password'])) {
+                $_SESSION['error'] = 'Current password is incorrect.';
+                $this->redirect($this->baseUrl('profile'));
+            }
+            if (strlen($newPassword) < 6) {
+                $_SESSION['error'] = 'New password must be at least 6 characters.';
+                $this->redirect($this->baseUrl('profile'));
+            }
+            if ($newPassword !== $confirmPassword) {
+                $_SESSION['error'] = 'New password confirmation does not match.';
+                $this->redirect($this->baseUrl('profile'));
+            }
+            $data['password'] = $newPassword;
+        }
+
+        if ($userModel->update($userId, $data)) {
+            $_SESSION['user_name'] = $name;
+            $_SESSION['user_email'] = $email;
+            $_SESSION['user_phone'] = $phone;
+            $_SESSION['success'] = 'Profile updated successfully.';
+        } else {
+            $_SESSION['error'] = 'Could not update profile.';
+        }
+
+        $this->redirect($this->baseUrl('profile'));
+    }
+
     /** User settings page */
     public function settings(): void
     {

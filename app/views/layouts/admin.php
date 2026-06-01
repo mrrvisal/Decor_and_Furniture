@@ -25,15 +25,33 @@ $pageTitle = $pageTitle ?? 'Admin';
             </a>
             <nav class="admin-nav">
                 <a href="<?= base_url('admin') ?>" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="9"></rect>
-                        <rect x="14" y="3" width="7" height="5"></rect>
-                        <rect x="14" y="12" width="7" height="9"></rect>
-                        <rect x="3" y="16" width="7" height="5"></rect>
-                    </svg>
-                    <span>Dashboard</span>
-                </a>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6"  y1="20" x2="6"  y2="14"/>
+    </svg>
+    <span>Analytics</span>
+</a>
+                <a href="<?= base_url('admin/audit-logs') ?>" class="nav-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+    </svg>
+    <span>Audit Logs</span>
+</a>
+<a href="<?= base_url('admin/reviews') ?>" class="nav-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 17l-6.3 4 2.3-7-6-4.6h7.6z"/>
+    </svg>
+    <span>Reviews</span>
+</a>
+<a href="<?= base_url('admin/stock-alerts') ?>" class="nav-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 17l-6.3 4 2.3-7-6-4.6h7.6z"/>
+    </svg>
+    <span>Stock Alerts</span>
+</a>
                 <a href="<?= base_url('admin/products') ?>" class="nav-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -44,6 +62,16 @@ $pageTitle = $pageTitle ?? 'Admin';
                         <line x1="12" y1="22.08" x2="12" y2="12"></line>
                     </svg>
                     <span>Products</span>
+                </a>
+                <a href="<?= base_url('admin/suppliers') ?>" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7h18" />
+                        <path d="M7 7v10" />
+                        <path d="M17 7v10" />
+                        <path d="M9 17h6" />
+                    </svg>
+                    <span>Suppliers</span>
                 </a>
                 <a href="<?= base_url('admin/orders') ?>" class="nav-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -70,8 +98,6 @@ $pageTitle = $pageTitle ?? 'Admin';
                     <button class="admin-dropdown-btn">
                         <span
                             class="admin-avatar"><?= strtoupper(substr($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? 'A', 0, 2)) ?></span>
-                        <span
-                            class="admin-name"><?= e($_SESSION['admin_name'] ?? $_SESSION['admin_username'] ?? 'Admin') ?></span>
                         <span class="dropdown-arrow">▼</span>
                     </button>
                     <div class="admin-dropdown-menu">
@@ -93,7 +119,7 @@ $pageTitle = $pageTitle ?? 'Admin';
                                 <polyline points="16 17 21 12 16 7"></polyline>
                                 <line x1="21" y1="12" x2="9" y2="12"></line>
                             </svg>
-                            Logout
+                            Logoutf
                         </a>
                     </div>
                 </div>

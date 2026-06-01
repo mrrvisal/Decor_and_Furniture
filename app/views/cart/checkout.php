@@ -1,4 +1,8 @@
 <?php require __DIR__ . '/../helpers.php'; ?>
+<?php
+$deliveryOptions = $deliveryOptions ?? [];
+$defaultDelivery = $deliveryOptions['local'] ?? ['fee' => 0, 'label' => 'Delivery'];
+?>
 <section class="checkout-section">
     <h1 style="margin: 0 0 1.5rem; font-size: 1.75rem; font-weight: 700;">Checkout</h1>
     <div class="checkout-grid">
@@ -53,6 +57,27 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 1rem;">
+                    <span style="font-size: 1.5rem;">🚚</span>
+                    <h2 style="margin: 0; font-size: 1.15rem; font-weight: 600;">Delivery Option</h2>
+                </div>
+                <div class="delivery-method-options">
+                    <?php foreach ($deliveryOptions as $key => $option): ?>
+                    <label class="delivery-option">
+                        <input type="radio" name="delivery_method" value="<?= e($key) ?>"
+                            data-fee="<?= number_format((float) $option['fee'], 2, '.', '') ?>"
+                            <?= $key === 'local' ? 'checked' : '' ?>>
+                        <span class="delivery-option-copy">
+                            <strong><?= e($option['label']) ?></strong>
+                            <small><?= e($option['description']) ?> · <?= e($option['eta']) ?></small>
+                        </span>
+                        <span class="delivery-option-fee">
+                            <?= (float) $option['fee'] > 0 ? '$' . number_format((float) $option['fee'], 2) : 'Free' ?>
+                        </span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 1rem;">
                     <span style="font-size: 1.5rem;">💳</span>
                     <h2 style="margin: 0; font-size: 1.15rem; font-weight: 600;">Payment Method</h2>
                 </div>
@@ -90,9 +115,79 @@
                 </li>
                 <?php endforeach; ?>
             </ul>
-            <p class="order-total" style="border: none;">
-                <strong>Total: $<?= number_format($total, 2) ?></strong>
-            </p>
+            <div class="checkout-totals">
+                <div class="checkout-total-row">
+                    <span>Subtotal</span>
+                    <strong>$<?= number_format($total, 2) ?></strong>
+                </div>
+                <div class="checkout-total-row">
+                    <span>Delivery</span>
+                    <strong id="delivery-fee"><?= (float) $defaultDelivery['fee'] > 0 ? '$' . number_format((float) $defaultDelivery['fee'], 2) : 'Free' ?></strong>
+                </div>
+                <div class="checkout-total-row grand">
+                    <span>Total</span>
+                    <strong id="checkout-grand-total">$<?= number_format($total + (float) $defaultDelivery['fee'], 2) ?></strong>
+                </div>
+            </div>
         </div>
     </div>
 </section>
+
+<script>
+const subtotal = <?= json_encode((float) $total) ?>;
+const feeText = document.getElementById('delivery-fee');
+const grandTotal = document.getElementById('checkout-grand-total');
+document.querySelectorAll('input[name="delivery_method"]').forEach(option => {
+    option.addEventListener('change', () => {
+        const fee = Number(option.dataset.fee || 0);
+        feeText.textContent = fee > 0 ? '$' + fee.toFixed(2) : 'Free';
+        grandTotal.textContent = '$' + (subtotal + fee).toFixed(2);
+    });
+});
+</script>
+
+<style>
+.delivery-method-options {
+    display: grid;
+    gap: .75rem;
+}
+.delivery-option {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: .75rem;
+    padding: .8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+.delivery-option:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(255, 107, 53, .06);
+}
+.delivery-option-copy {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+}
+.delivery-option-copy small {
+    color: var(--text-muted);
+}
+.delivery-option-fee {
+    font-weight: 700;
+    color: var(--text);
+}
+.checkout-totals {
+    margin-top: 1rem;
+}
+.checkout-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.checkout-total-row.grand {
+    border-bottom: none;
+    font-size: 1.08rem;
+}
+</style>

@@ -18,6 +18,22 @@ class OtpVerification
         $this->db = Database::getInstance();
     }
 
+    /**
+ * Clean up expired and used OTPs
+ * Should be called periodically (e.g., on each OTP request)
+ */
+public function cleanup(): int
+{
+    $stmt = $this->db->prepare("
+        DELETE FROM {$this->table} 
+        WHERE expires_at < NOW() 
+           OR used = 1
+           OR created_at < DATE_SUB(NOW(), INTERVAL 1 DAY)
+    ");
+    $stmt->execute();
+    return $stmt->rowCount();
+}
+
     public function create(string $email, string $type): string
     {
         $otp = (string) random_int(100000, 999999);

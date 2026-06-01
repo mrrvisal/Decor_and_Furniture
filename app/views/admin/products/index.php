@@ -81,6 +81,7 @@
                         <th class="text-center" style="width: 80px;">Image</th>
                         <th>Product Name</th>
                         <th>Category</th>
+                        <th>Supplier</th>
                         <th class="text-right">Price</th>
                         <th class="text-center">Stock</th>
                         <th class="text-center">Status</th>
@@ -101,6 +102,9 @@
                         </td>
                         <td>
                             <span class="category-badge"><?= e($p['category_name'] ?? '') ?></span>
+                        </td>
+                        <td>
+                            <span class="supplier-badge"><?= e($p['supplier_name'] ?? 'No supplier') ?></span>
                         </td>
                         <td class="text-right">
                             <span class="price">$<?= number_format($p['price'], 2) ?></span>

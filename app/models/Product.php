@@ -89,8 +89,8 @@ class Product
     {
         $slug = $this->slugify($data['name']);
         $stmt = $this->db->prepare("
-            INSERT INTO {$this->table} (category_id, name, slug, description, price, stock, image, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO {$this->table} (category_id, name, slug, description, price, stock, supplier_id, image, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['category_id'],
@@ -99,6 +99,7 @@ class Product
             $data['description'] ?? null,
             $data['price'],
             $data['stock'] ?? 0,
+            $data['supplier_id'] ?? null,
             $data['image'] ?? null,
             $data['is_active'] ?? 1,
         ]);
@@ -109,7 +110,7 @@ class Product
     {
         $slug = isset($data['name']) ? $this->slugify($data['name']) : null;
         $stmt = $this->db->prepare("
-            UPDATE {$this->table} SET category_id = ?, name = ?, slug = COALESCE(?, slug), description = ?, price = ?, stock = ?, image = COALESCE(?, image), is_active = ?
+            UPDATE {$this->table} SET category_id = ?, name = ?, slug = COALESCE(?, slug), description = ?, price = ?, stock = ?, supplier_id = ?, image = COALESCE(?, image), is_active = ?
             WHERE id = ?
         ");
         $product = $this->find($id);
@@ -120,6 +121,7 @@ class Product
             $data['description'] ?? $product['description'],
             $data['price'] ?? $product['price'],
             $data['stock'] ?? $product['stock'],
+            array_key_exists('supplier_id', $data) ? $data['supplier_id'] : $product['supplier_id'],
             $data['image'] ?? $product['image'],
             $data['is_active'] ?? $product['is_active'],
             $id,

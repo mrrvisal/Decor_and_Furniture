@@ -54,6 +54,7 @@
                     <th class="date-col">Date</th>
                     <th class="total-col">Total</th>
                     <th class="status-col">Status</th>
+                    <th class="status-col">Delivery</th>
                     <th class="action-col"></th>
                 </tr>
             </thead>
@@ -95,6 +96,11 @@
                             $icon = $statusIcons[$statusText] ?? '';
                             echo $icon . ' ' . e($statusText);
                             ?>
+                        </span>
+                    </td>
+                    <td data-label="Delivery">
+                        <span class="status">
+                            <?= e(ucfirst(str_replace('_', ' ', $o['delivery_status'] ?? 'not_ready'))) ?>
                         </span>
                     </td>
                     <td data-label="">

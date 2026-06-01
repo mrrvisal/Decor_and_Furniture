@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use Core\Controller;
 use Core\Database;
+use Core\StockAlert;
 use App\Models\Order;
 use App\Models\Cart;
 use App\Models\Product;
@@ -37,6 +38,7 @@ class OrderController extends Controller
         $this->view('cart.checkout', [
             'items' => $items,
             'total' => $total,
+            'deliveryOptions' => $this->deliveryOptions($total),
             'csrf_token' => $this->csrfToken(),
             'cartCount' => $this->cartModel->count($userId),
         ]);
@@ -57,6 +59,14 @@ class OrderController extends Controller
             $this->redirect($this->baseUrl('cart'));
         }
         $total = $this->cartModel->getTotal($userId);
+        $deliveryMethod = $_POST['delivery_method'] ?? 'local';
+        $deliveryOptions = $this->deliveryOptions($total);
+        if (!isset($deliveryOptions[$deliveryMethod])) {
+            $_SESSION['error'] = 'Please select a delivery option.';
+            $this->redirect($this->baseUrl('cart/checkout'));
+        }
+        $deliveryFee = $deliveryOptions[$deliveryMethod]['fee'];
+        $orderTotal = $total + $deliveryFee;
         $paymentMethod = $_POST['payment_method'] ?? '';
         if (!in_array($paymentMethod, ['qr_code', 'pay_later'])) {
             $_SESSION['error'] = 'Please select a payment method.';
@@ -71,11 +81,14 @@ class OrderController extends Controller
             $this->redirect($this->baseUrl('cart/checkout'));
         }
         $db = Database::getInstance();
+        $orderedProductIds = [];
         $db->beginTransaction();
         try {
             $orderId = $this->orderModel->create($userId, [
-                'total_amount' => $total,
+                'total_amount' => $orderTotal,
                 'payment_method' => $paymentMethod,
+                'delivery_method' => $deliveryMethod,
+                'delivery_fee' => $deliveryFee,
                 'shipping_name' => $name,
                 'shipping_email' => $email,
                 'shipping_phone' => $phone,
@@ -88,6 +101,7 @@ class OrderController extends Controller
                 $qty = min((int) $item['quantity'], (int) $item['stock']);
                 $this->orderModel->addItem($orderId, $item['product_id'], $item['name'], (float) $item['price'], $qty);
                 $this->productModel->decrementStock($item['product_id'], $qty);
+                $orderedProductIds[] = (int) $item['product_id'];
             }
             $this->cartModel->clear($userId);
             $db->commit();
@@ -95,6 +109,9 @@ class OrderController extends Controller
             $db->rollBack();
             $_SESSION['error'] = 'Order failed. Please try again.';
             $this->redirect($this->baseUrl('cart/checkout'));
+        }
+        foreach (array_unique($orderedProductIds) as $productId) {
+            StockAlert::createIfNeeded($productId);
         }
         $order = $this->orderModel->find($orderId);
         if ($paymentMethod === 'qr_code') {
@@ -143,5 +160,29 @@ class OrderController extends Controller
         }
         $items = $this->orderModel->getItems($order['id']);
         $this->view('cart.order-detail', ['order' => $order, 'items' => $items, 'cartCount' => $this->cartModel->count((int) $_SESSION['user_id'])]);
+    }
+
+    private function deliveryOptions(float $subtotal): array
+    {
+        return [
+            'pickup' => [
+                'label' => 'Store pickup',
+                'description' => 'Pick up from our showroom',
+                'fee' => 0.00,
+                'eta' => 'Ready in 24 hours',
+            ],
+            'local' => [
+                'label' => 'Phnom Penh delivery',
+                'description' => 'Delivery inside Phnom Penh',
+                'fee' => $subtotal >= 50 ? 0.00 : 3.00,
+                'eta' => '1-2 business days',
+            ],
+            'province' => [
+                'label' => 'Province delivery',
+                'description' => 'Delivery to other provinces',
+                'fee' => $subtotal >= 100 ? 0.00 : 6.00,
+                'eta' => '3-5 business days',
+            ],
+        ];
     }
 }

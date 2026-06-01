@@ -21,10 +21,6 @@
                 <input type="password" id="password" name="password" required placeholder="Enter your password"
                     autocomplete="current-password">
             </div>
-            <div class="remember-me">
-                <input type="checkbox" name="remember" id="remember">
-                <label for="remember">Remember me</label>
-            </div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
         </form>
         <p style="text-align: center; margin-top: 1.25rem;">

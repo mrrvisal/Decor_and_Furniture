@@ -73,7 +73,6 @@ $navLinks = [
                     <button class="user-dropdown-btn">
                         <img src="<?= e(avatar($_SESSION['admin_avatar'] ?? null, 'admins')) ?>" alt="Profile"
                             class="user-avatar">
-                        <span class="user-name"><?= e($_SESSION['admin_name'] ?? 'Admin') ?></span>
                         <span class="dropdown-arrow">▼</span>
                     </button>
                     <div class="user-dropdown-menu">

@@ -1,5 +1,10 @@
 <?php require __DIR__ . '/../helpers.php'; ?>
 <section class="qr-payment-section container">
+    <div class="print-receipt-title">
+        <h1>Payment Receipt</h1>
+        <p><?= e($order['order_number']) ?></p>
+    </div>
+
     <!-- Payment Header -->
     <div class="qr-payment-header">
         <div class="qr-header-icon">
@@ -133,7 +138,7 @@
             </svg>
             My Orders
         </a>
-        <button type="button" class="btn btn-primary" onclick="window.print()">
+        <button type="button" class="btn btn-primary" onclick="printPaymentReceipt()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -151,9 +156,35 @@
         var el = document.getElementById('qr-placeholder');
         if (typeof renderQR === 'function' && data) renderQR(el, data);
     });
+
+    function printPaymentReceipt() {
+        var previousTitle = document.title;
+        var receiptTitle = 'Receipt-' + <?= json_encode($order['order_number'] ?? 'order') ?>;
+        document.title = receiptTitle;
+
+        var qrImage = document.querySelector('#qr-placeholder img');
+        if (qrImage && !qrImage.complete) {
+            qrImage.onload = function () {
+                window.print();
+                document.title = previousTitle;
+            };
+            qrImage.onerror = function () {
+                window.print();
+                document.title = previousTitle;
+            };
+            return;
+        }
+
+        window.print();
+        document.title = previousTitle;
+    }
 </script>
 
 <style>
+    .print-receipt-title {
+        display: none;
+    }
+
     /* QR Payment Header */
     .qr-payment-header {
         display: flex;
@@ -388,6 +419,152 @@
 
     .qr-actions .btn {
         min-width: 160px;
+    }
+
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 14mm;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
+
+        html,
+        body {
+            background: #fff;
+            color: #000;
+            width: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12pt;
+        }
+
+        .site-header,
+        .site-footer,
+        .nav-main,
+        .footer-grid,
+        .footer-divider,
+        .footer-copyright,
+        .qr-payment-header,
+        .qr-instructions,
+        .qr-notice,
+        .qr-actions,
+        .btn {
+            display: none !important;
+        }
+
+        .qr-payment-section {
+            width: 100% !important;
+            max-width: 720px !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            text-align: left !important;
+        }
+
+        .print-receipt-title {
+            display: block !important;
+            text-align: center;
+            margin: 0 0 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #111;
+        }
+
+        .print-receipt-title h1 {
+            margin: 0 0 6px;
+            font-size: 22pt;
+            color: #000;
+        }
+
+        .print-receipt-title p {
+            margin: 0;
+            font-size: 11pt;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #444;
+        }
+
+        .qr-order-card,
+        .qr-code-card {
+            width: 100% !important;
+            box-shadow: none !important;
+            border: 1px solid #bbb !important;
+            border-radius: 0 !important;
+            background: #fff !important;
+            margin: 0 0 14px !important;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            overflow: visible !important;
+        }
+
+        .qr-card-header {
+            color: #000 !important;
+            background: transparent !important;
+            border-bottom: 1px solid #ddd !important;
+            padding: 10px 0 !important;
+        }
+
+        .qr-card-header h2 {
+            font-size: 15pt !important;
+        }
+
+        .qr-card-header svg,
+        .info-label svg {
+            display: none !important;
+        }
+
+        .qr-code-wrap {
+            padding: 16px !important;
+            margin: 0 !important;
+            text-align: center !important;
+        }
+
+        .qr-placeholder {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .qr-placeholder img {
+            width: 190px !important;
+            height: 190px !important;
+            max-width: 190px !important;
+        }
+
+        .order-info-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            gap: 18px !important;
+            padding: 10px 0 !important;
+        }
+
+        .order-info-row:not(:last-child) {
+            border-bottom: 1px dashed #ddd !important;
+        }
+
+        .order-number,
+        .order-amount,
+        .qr-status {
+            color: #000 !important;
+        }
+
+        .info-label {
+            color: #444 !important;
+            font-size: 11pt !important;
+        }
+
+        .order-number {
+            word-break: break-word;
+            text-align: right;
+        }
+
+        .qr-data-text {
+            display: none !important;
+        }
     }
 
     /* Mobile Responsive */

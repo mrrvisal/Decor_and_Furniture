@@ -11,6 +11,7 @@ class User
 {
     private PDO $db;
     private string $table = 'users';
+    private ?array $columns = null;
 
     public function __construct()
     {
@@ -53,19 +54,34 @@ class User
     {
         $fields = [];
         $values = [];
-        foreach (['name', 'phone', 'email_verified_at', 'is_active', 'address', 'city', 'postcode', 'country'] as $f) {
+        foreach (['name', 'email', 'phone', 'email_verified_at', 'is_active', 'address', 'city', 'postcode', 'country'] as $f) {
             if (array_key_exists($f, $data)) {
+                if (!in_array($f, $this->getColumns(), true)) {
+                    continue;
+                }
                 $fields[] = "{$f} = ?";
                 $values[] = $data[$f];
             }
         }
-        if (isset($data['password'])) {
+        if (isset($data['password']) && in_array('password', $this->getColumns(), true)) {
             $fields[] = 'password = ?';
             $values[] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        if (empty($fields)) {
+            return false;
         }
         $values[] = $id;
         $stmt = $this->db->prepare("UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = ?");
         return $stmt->execute($values);
+    }
+
+    private function getColumns(): array
+    {
+        if ($this->columns === null) {
+            $stmt = $this->db->query("DESCRIBE {$this->table}");
+            $this->columns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Field');
+        }
+        return $this->columns;
     }
 
     public function verifyEmail(int $id): bool

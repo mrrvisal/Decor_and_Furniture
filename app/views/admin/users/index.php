@@ -99,15 +99,6 @@ $hasFilters = !empty($filters['search']) ||
                                     class="btn btn-sm btn-secondary">View</a>
                                 <a href="<?php echo base_url('admin/user/edit/' . $u['id']); ?>"
                                     class="btn btn-sm btn-primary">Edit</a>
-                                <button type="button"
-                                    class="btn btn-sm <?php echo $u['is_active'] ? 'btn-remove' : 'btn btn-sm btn-success'; ?>"
-                                    style="<?php echo $u['is_active'] ? 'background: var(--warning-bg); color: #92400e;' : ''; ?>"
-                                    data-bs-toggle="modal" data-bs-target="#toggleModal"
-                                    data-id="<?php echo e($u['id']); ?>" data-name="<?php echo e($u['name']); ?>"
-                                    data-action="<?php echo $u['is_active'] ? 'deactivate' : 'activate'; ?>"
-                                    data-url="<?php echo base_url('admin/user/toggle-status/' . $u['id']); ?>">
-                                    <?php echo $u['is_active'] ? 'Off' : 'On'; ?>
-                                </button>
                                 <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
                                     data-bs-target="#deleteModal" data-id="<?php echo e($u['id']); ?>"
                                     data-name="<?php echo e($u['name']); ?>"

@@ -114,6 +114,65 @@
                     </div>
                 </div>
             </div>
+
+            <div class="info-card">
+                <div class="info-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                    <h3>Edit Admin Information</h3>
+                </div>
+                <form method="post" action="<?= base_url('admin/profile/update') ?>" class="profile-edit-form">
+                    <input type="hidden" name="csrf_token" value="<?= e($csrf_token ?? '') ?>">
+
+                    <div class="profile-form-grid">
+                        <div class="profile-form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" class="form-input" required minlength="3"
+                                value="<?= e($admin['username'] ?? '') ?>">
+                        </div>
+                        <div class="profile-form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" required minlength="2"
+                                value="<?= e($admin['name'] ?? '') ?>">
+                        </div>
+                        <div class="profile-form-group full-width">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" required
+                                value="<?= e($admin['email'] ?? '') ?>">
+                        </div>
+                    </div>
+
+                    <div class="password-panel">
+                        <h4>Change Password</h4>
+                        <p class="muted">Leave password fields blank to keep the current password.</p>
+                        <div class="profile-form-grid">
+                            <div class="profile-form-group">
+                                <label for="current_password">Current Password</label>
+                                <input type="password" id="current_password" name="current_password" class="form-input"
+                                    autocomplete="current-password">
+                            </div>
+                            <div class="profile-form-group">
+                                <label for="new_password">New Password</label>
+                                <input type="password" id="new_password" name="new_password" class="form-input"
+                                    minlength="6" autocomplete="new-password">
+                            </div>
+                            <div class="profile-form-group full-width">
+                                <label for="confirm_password">Confirm New Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-input"
+                                    minlength="6" autocomplete="new-password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-form-actions">
+                        <button type="reset" class="btn btn-ghost">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </section>
@@ -353,6 +412,61 @@
     width: fit-content;
 }
 
+/* Edit Form */
+.profile-edit-form {
+    padding: 1.25rem;
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.profile-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.profile-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.profile-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.profile-form-group .form-input {
+    width: 100%;
+}
+
+.password-panel {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.password-panel h4 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.password-panel .muted {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+}
+
+.profile-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
 /* Stats Mini Grid */
 .stats-mini-grid {
     display: grid;
@@ -424,6 +538,19 @@
     }
 
     .profile-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-form-actions {
+        flex-direction: column;
+    }
+
+    .profile-form-actions .btn {
         width: 100%;
         justify-content: center;
     }

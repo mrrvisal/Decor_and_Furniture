@@ -74,6 +74,7 @@ class AuthController extends Controller
     /** Send OTP for registration */
     public function registerSendOtp(): void
     {
+        
         if (!$this->validateCsrf()) {
             $this->json(['success' => false, 'message' => 'Invalid request.']);
         }
@@ -90,6 +91,7 @@ class AuthController extends Controller
         if ($this->userModel->findByEmail($email)) {
             $this->json(['success' => false, 'message' => 'Email already registered.']);
         }
+        $this->otpModel->cleanup();
         $otp = $this->otpModel->create($email, 'register');
         if (Mail::sendOtp($email, $otp, 'register')) {
             $_SESSION['register_pending'] = ['email' => $email, 'name' => $name, 'password' => $password, 'phone' => $phone];
@@ -162,6 +164,7 @@ class AuthController extends Controller
         if (!$this->userModel->findByEmail($email)) {
             $this->json(['success' => false, 'message' => 'No account with this email.']);
         }
+        $this->otpModel->cleanup();
         $otp = $this->otpModel->create($email, 'forgot_password');
         if (Mail::sendOtp($email, $otp, 'forgot_password')) {
             $_SESSION['forgot_email'] = $email;

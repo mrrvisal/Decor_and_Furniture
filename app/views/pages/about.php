@@ -243,7 +243,6 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: #ff6b35;
 }
 
 .hero-content h1 {
@@ -442,7 +441,6 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: #ff6b35;
 }
 
 .stats-grid {

@@ -1209,7 +1209,6 @@ body {
   padding: 2rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-width: 560px;
 }
 .admin-form-section h1 {
   margin: 0 0 1.5rem;

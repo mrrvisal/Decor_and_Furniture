@@ -32,7 +32,17 @@
                     </option>
                 </select>
             </div>
-            <?php if (!empty($filters['search']) || !empty($filters['status'])): ?>
+            <div class="filter-select-wrap">
+                <select name="delivery_status" class="filter-select">
+                    <option value="">All delivery</option>
+                    <?php foreach (['not_ready' => 'Not ready', 'ready' => 'Ready', 'out_for_delivery' => 'Out for delivery', 'delivered' => 'Delivered'] as $value => $label): ?>
+                    <option value="<?= e($value) ?>" <?= ($filters['delivery_status'] ?? '') === $value ? 'selected' : '' ?>>
+                        <?= e($label) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php if (!empty($filters['search']) || !empty($filters['status']) || !empty($filters['delivery_status'])): ?>
             <a href="<?= base_url('admin/orders') ?>" class="btn btn-ghost btn-sm">Clear</a>
             <?php endif; ?>
         </form>
@@ -45,6 +55,7 @@
                         <th>Customer</th>
                         <th>Total</th>
                         <th>Status</th>
+                        <th>Delivery</th>
                         <th>Date</th>
                         <th class="text-right">Actions</th>
                     </tr>
@@ -67,6 +78,11 @@
                         <td>
                             <span class="status-badge status-<?= e($o['status']) ?>">
                                 <?= e(ucfirst(str_replace('_', ' ', $o['status']))) ?>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="delivery-chip">
+                                <?= e(ucfirst(str_replace('_', ' ', $o['delivery_status'] ?? 'not_ready'))) ?>
                             </span>
                         </td>
                         <td>
@@ -105,12 +121,18 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const statusSelect = document.querySelector('.filter-select[name="status"]');
+    const deliverySelect = document.querySelector('.filter-select[name="delivery_status"]');
     const searchInput = document.querySelector('.filter-input[name="q"]');
     const filterForm = document.querySelector('.admin-filters-form');
 
     // Auto-submit on status change
     if (statusSelect) {
         statusSelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    }
+    if (deliverySelect) {
+        deliverySelect.addEventListener('change', function() {
             filterForm.submit();
         });
     }
@@ -248,6 +270,18 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.8rem;
     font-weight: 600;
     text-transform: capitalize;
+}
+
+.delivery-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
 }
 
 .status-pending,
