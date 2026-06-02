@@ -109,10 +109,6 @@ class StockAlert
                         <td style='padding: 8px; border: 1px solid #ddd;'>{$currentStock}</td>
                     </tr>
                     <tr>
-                        <td style='padding: 8px; border: 1px solid #ddd; font-weight: bold;'>Reorder level</td>
-                        <td style='padding: 8px; border: 1px solid #ddd;'>{$reorderLevel}</td>
-                    </tr>
-                    <tr>
                         <td style='padding: 8px; border: 1px solid #ddd; font-weight: bold;'>Requested quantity</td>
                         <td style='padding: 8px; border: 1px solid #ddd;'>{$reorderQuantity}</td>
                     </tr>
@@ -124,7 +120,6 @@ class StockAlert
         $bodyText = "{$alertLabel} alert\n\n"
             . "Product: {$product['name']}\n"
             . "Current stock: {$currentStock}\n"
-            . "Reorder level: {$reorderLevel}\n"
             . "Requested quantity: {$reorderQuantity}\n\n"
             . "Please prepare a restock for this item.";
 
